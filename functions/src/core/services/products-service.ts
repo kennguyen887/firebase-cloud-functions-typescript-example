@@ -2,7 +2,7 @@ import {Product} from "../data/product";
 import {firestore} from "firebase-admin";
 import * as admin from "firebase-admin";
 import {ProductFirestoreModel} from "../data/models/product/firestore/product-firestore-model";
-import FieldValue = firestore.FieldValue;
+import Timestamp = firestore.Timestamp;
 import {PartialProductFirestoreModel} from "../data/models/product/firestore/partial-product-firestore-model";
 
 
@@ -25,7 +25,7 @@ export class ProductsService {
 
     async createProduct(product:Product) : Promise<Product>{
         const productRef = this.doc();
-        const data = ProductFirestoreModel.fromEntity(product).toDocumentData(productRef.id, FieldValue.serverTimestamp());
+        const data = ProductFirestoreModel.fromEntity(product).toDocumentData(productRef.id);
         await productRef.set(data);
         return ProductFirestoreModel.fromDocumentData((await productRef.get()).data());
     }

@@ -20,19 +20,18 @@
     "indexes": "firestore.indexes.json"
   },
   "emulators": {
-    "auth": {
-      "port": 3002
-    },
     "functions": {
       "port": 3003
     },
     "firestore": {
-      "port": 3004
+      "port": 8087
     },
     "ui": {
-      "enabled": true,
-      "port": 3005
+      "enabled": true
     },
-    "singleProjectMode": true
+    "singleProjectMode": true,
+    "auth": {
+      "port": 9099
+    }
   }
 }

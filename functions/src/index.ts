@@ -1,7 +1,7 @@
 import * as admin from "firebase-admin";
 import {logger, https} from "firebase-functions";
 import {apiApp} from "./api";
-import {eventTriggers} from "./event-triggers";
+// import {eventTriggers} from "./event-triggers";
 
 export type UserRole = "storeOwner" | "buyer" | "admin";
 
@@ -13,4 +13,4 @@ process.env.TZ = "US/Central"; // TODO: Replace "US/Central" with your timezone.
 admin.initializeApp();
 
 exports.api = https.onRequest(apiApp);
-Object.assign(exports, eventTriggers());
+// Object.assign(exports, eventTriggers());

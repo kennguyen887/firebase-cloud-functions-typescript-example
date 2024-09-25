@@ -1,0 +1,13 @@
+{
+  "projects": {
+    "havafyApi": "havafy-app",
+    "default": "havafy-app"
+  },
+  "targets": {},
+  "etags": {},
+  "dataconnectEmulatorConfig": {
+    "postgres": {
+      "localConnectionString": "postgresql://localhost:5432?sslmode=disable"
+    }
+  }
+}

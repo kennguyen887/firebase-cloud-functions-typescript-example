@@ -3,8 +3,10 @@ import {DbChangedRecord} from "../data/db-changed-record";
 import {
     DbChangedRecordFirestoreModel
 } from "../data/models/db-changed-record/firestore/db-changed-record-firestore-model";
-import FieldValue = firestore.FieldValue;
+
 import * as admin from "firebase-admin";
+
+import Timestamp = firestore.Timestamp;
 
 class DbChangesService {
     private get collectionRef () { return admin.firestore().collection("db-changes"); }
@@ -13,7 +15,7 @@ class DbChangesService {
         const ref = this.collectionRef.doc();
         const documentData = DbChangedRecordFirestoreModel
             .fromEntity(record.copyWith({ recordId: ref.id }))
-            .toDocumentData(FieldValue.serverTimestamp());
+            .toDocumentData(new Date());
         await ref.set(documentData);
     }
 

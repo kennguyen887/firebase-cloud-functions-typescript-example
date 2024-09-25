@@ -23,10 +23,10 @@ export class ProductFirestoreModel extends Product {
         return new ProductFirestoreModel('','','',0,0,'', new Date());
     }
 
-    toDocumentData(productId?: string, createdAt?: Timestamp| FieldValue) {
+    toDocumentData(productId?: string) {
         return {
             [ProductFirestoreModel.kProductId]: productId ?? this.productId,
-            [ProductFirestoreModel.kCreatedAt]: createdAt ?? this.createdAt,
+            [ProductFirestoreModel.kCreatedAt]: new Date(),
             [ProductFirestoreModel.kStoreOwnerUid]: this.storeOwnerUid,
             [ProductFirestoreModel.kName]: this.name,
             [ProductFirestoreModel.kPrice]: this.price,
