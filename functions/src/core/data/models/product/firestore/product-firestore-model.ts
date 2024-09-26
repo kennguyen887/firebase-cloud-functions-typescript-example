@@ -1,4 +1,4 @@
-import {Product} from "../../../product";
+import {Product, ProductType, ProductStatus } from "../../../product";
 import {firestore} from "firebase-admin";
 import FieldValue = firestore.FieldValue;
 import Timestamp = firestore.Timestamp;
@@ -11,6 +11,9 @@ export class ProductFirestoreModel extends Product {
     static kStoreOwnerUid = "storeOwnerUid";
     static kName = "name";
     static kPrice = "price";
+    static kContent = "content";
+    static kStatus = "status";
+    static kType = "type";
     static kStockQuantity = "stockQuantity";
     static kInternalCode = "internalCode";
 
@@ -19,10 +22,21 @@ export class ProductFirestoreModel extends Product {
         return Object.assign(ProductFirestoreModel.empty(), product);
     }
 
-    static empty() {
-        return new ProductFirestoreModel('','','',0,0,'', new Date());
-    }
 
+    static empty() {
+        return new ProductFirestoreModel(
+          "",
+          "",
+          "",
+          0,
+          "",
+          ProductType.PHYSICAL,
+          ProductStatus.ACTIVE,
+          0,
+          "",
+          new Date()
+        );
+      }
     toDocumentData(productId?: string) {
         return {
             [ProductFirestoreModel.kProductId]: productId ?? this.productId,
@@ -41,6 +55,9 @@ export class ProductFirestoreModel extends Product {
             data[ProductFirestoreModel.kStoreOwnerUid],
             data[ProductFirestoreModel.kName],
             data[ProductFirestoreModel.kPrice],
+            data[ProductFirestoreModel.kContent],
+            data[ProductFirestoreModel.kType],
+            data[ProductFirestoreModel.kStatus],
             data[ProductFirestoreModel.kStockQuantity],
             data[ProductFirestoreModel.kInternalCode],
             (data[ProductFirestoreModel.kCreatedAt] as Timestamp).toDate(),

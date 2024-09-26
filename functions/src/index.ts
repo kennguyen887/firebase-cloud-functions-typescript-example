@@ -3,7 +3,7 @@ const { onRequest } = require("firebase-functions/v2/https");
 import { apiApp } from "./api";
 // import {eventTriggers} from "./event-triggers";
 
-export type UserRole = "storeOwner" | "buyer" | "admin";
+export type UserRole = "user" | "admin";
 
 export type MyClaims = "authenticated" | UserRole; // TODO: add OR operation with our own claims;
 

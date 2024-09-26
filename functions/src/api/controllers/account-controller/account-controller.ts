@@ -11,7 +11,7 @@ import {environment} from "../../../environment";
 export class AccountController implements Controller {
 
     initialize(httpServer: HttpServer): void {
-       // httpServer.post ('/account', this.createAccount.bind(this));
+       httpServer.post ('/account', this.createAccount.bind(this));
         httpServer.post ('/login', this.loginAccount.bind(this));
     }
 
@@ -31,17 +31,6 @@ export class AccountController implements Controller {
 
     private readonly loginAccount: RequestHandler = async (req, res, next,) => {
         const input: { password: string, email: string } = req.body;
-        // EmailAuthProvider credential for email and password
-const credential = EmailAuthProvider.credential('user@example.com', 'userPassword');
-
-signInWithCredential(getAuth(), credential)
-  .then((userCredential) => {
-    const user = userCredential.user;
-    console.log('Signed in with credential:', user);
-  })
-  .catch((error) => {
-    console.error('Error signing in with credential:', error);
-  });
         res.send({
             "user": input,
         });

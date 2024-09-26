@@ -1,63 +1,71 @@
-import {Product} from "../../../product";
+import { Product, ProductType, ProductStatus } from "../../../product";
 import {
-    validateInternalCode,
-    validateProductName,
-    validateProductPrice,
-    validateStockQuantity
+  validateInternalCode,
+  validateProductName,
+  validateProductPrice,
+  validateStockQuantity,
 } from "./validators";
 
-
 export class ProductClientModel extends Product {
-    static kProductId = "productId";
-    static kStoreOwnerUid = "storeOwnerUid";
-    static kName = "name";
-    static kPrice = "price";
-    static kStockQuantity = "stockQuantity";
-    static kInternalCode = "internalCode";
-    static kCreatedAtMillisecondsSinceEpoch = "createdAtMillisecondsSinceEpoch";
+  static kProductId = "productId";
+  static kStoreOwnerUid = "storeOwnerUid";
+  static kName = "name";
+  static kPrice = "price";
+  static kContent = "content";
+  static kStatus = "status";
+  static kType = "type";
+  static kStockQuantity = "stockQuantity";
+  static kInternalCode = "internalCode";
+  static kCreatedAtMillisecondsSinceEpoch = "createdAtMillisecondsSinceEpoch";
 
-    static fromEntity (product: Product): ProductClientModel {
-        return Object.assign(ProductClientModel.empty(), product);
-    }
+  static fromEntity(product: Product): ProductClientModel {
+    return Object.assign(ProductClientModel.empty(), product);
+  }
 
-    static empty() {
-        return new ProductClientModel('','','',0,0,'', new Date());
-    }
+  static empty() {
+    return new ProductClientModel("", "", "", 0,         "",
+        ProductType.PHYSICAL,
+        ProductStatus.ACTIVE,0, "", new Date());
+  }
 
-    private static _validate(body: any) {
-        validateProductName(body[ProductClientModel.kName]);
-        validateProductPrice(body[ProductClientModel.kPrice]);
-        validateStockQuantity(body[ProductClientModel.kStockQuantity]);
-        validateInternalCode(body[ProductClientModel.kInternalCode]);
-    }
+  private static _validate(body: any) {
+    validateProductName(body[ProductClientModel.kName]);
+    validateProductPrice(body[ProductClientModel.kPrice]);
+    validateStockQuantity(body[ProductClientModel.kStockQuantity]);
+    validateInternalCode(body[ProductClientModel.kInternalCode]);
+  }
 
-    static validate (body: any, storeOwnerUid: string) : ProductClientModel {
-        this._validate(body);
-        return new ProductClientModel(
-            null,
-            storeOwnerUid,
-            body[ProductClientModel.kName],
-            body[ProductClientModel.kPrice],
-            body[ProductClientModel.kStockQuantity],
-            body[ProductClientModel.kInternalCode],
-            null,
-        );
-    }
+  static validate(body: any, storeOwnerUid: string): ProductClientModel {
+    this._validate(body);
+    return new ProductClientModel(
+      null,
+      storeOwnerUid,
+      body[ProductClientModel.kName],
+      body[ProductClientModel.kPrice],
+      body[ProductClientModel.kContent],
+      body[ProductClientModel.kType],
+      body[ProductClientModel.kStatus],
+      body[ProductClientModel.kStockQuantity],
+      body[ProductClientModel.kInternalCode],
+      null
+    );
+  }
 
-    toBodyFullProduct() {
-        return {
-            ...this.toBodyPublicProduct(),
-            [ProductClientModel.kStockQuantity]: this.stockQuantity,
-            [ProductClientModel.kInternalCode]: this.internalCode,
-            [ProductClientModel.kCreatedAtMillisecondsSinceEpoch]: this.createdAt.getTime(),
-        }
-    }
-    toBodyPublicProduct() {
-        return {
-            [ProductClientModel.kProductId]: this.productId,
-            [ProductClientModel.kStoreOwnerUid]: this.storeOwnerUid,
-            [ProductClientModel.kName]: this.name,
-            [ProductClientModel.kPrice]: this.price,
-        }
-    }
+  toBodyFullProduct() {
+    return {
+      ...this.toBodyPublicProduct(),
+      [ProductClientModel.kStockQuantity]: this.stockQuantity,
+      [ProductClientModel.kInternalCode]: this.internalCode,
+      [ProductClientModel.kCreatedAtMillisecondsSinceEpoch]:
+        this.createdAt.getTime(),
+    };
+  }
+  toBodyPublicProduct() {
+    return {
+      [ProductClientModel.kProductId]: this.productId,
+      [ProductClientModel.kStoreOwnerUid]: this.storeOwnerUid,
+      [ProductClientModel.kName]: this.name,
+      [ProductClientModel.kPrice]: this.price,
+    };
+  }
 }

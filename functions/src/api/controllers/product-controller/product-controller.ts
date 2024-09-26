@@ -11,15 +11,15 @@ import {MyClaims} from "../../../index";
 export class ProductController implements Controller {
 
     initialize(httpServer: HttpServer,): void {
-        httpServer.post('/product', this.createProduct.bind(this), ['storeOwner', 'admin']);
+        httpServer.post('/product', this.createProduct.bind(this), ['user', 'admin']);
 
         /** If claims are equal to ['buyer', 'storeOwner'], that means the same as "authenticated" */
         /** But if claims are undefined or [], that means that also unauthenticated users can access */
-        httpServer.get ('/all-products-public', this.getProductListPublic.bind(this), ['buyer', 'storeOwner', 'admin']);
+        httpServer.get ('/all-products-public', this.getProductListPublic.bind(this), ['user', 'admin']);
         httpServer.get ('/product/:productId', this.getProductByIdPublic.bind(this), ['authenticated']);
 
-        httpServer.get ('/product/:productId/full-details', this.getProductByIdFull.bind(this), ['storeOwner', 'admin']);
-        httpServer.put ('/product/:productId', this.updateProductById.bind(this), ['storeOwner', 'admin']);
+        httpServer.get ('/product/:productId/full-details', this.getProductByIdFull.bind(this), ['user', 'admin']);
+        httpServer.put ('/product/:productId', this.updateProductById.bind(this), ['user', 'admin']);
     }
 
     private readonly createProduct: RequestHandler = async (req, res, next,) => {
