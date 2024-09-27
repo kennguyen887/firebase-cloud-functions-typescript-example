@@ -1,36 +1,130 @@
-import {Controller, HttpServer} from "../index";
-import {RequestHandler} from "express";
-import { getAuth, signInWithCredential, EmailAuthProvider } from 'firebase/auth';
-import * as admin from "firebase-admin";
-import pageService from "../../../core/services/pages-service";
-import {UserClientModel} from "../../../core/data/models/user/client/user-client-model";
-import {HttpResponseError} from "../../../core/utils/http-response-error";
-import {environment} from "../../../environment";
-
-
+import { Controller, HttpServer } from "../index";
+import { RequestHandler } from "express";
+import pageService from "../../../core/services/page-service";
+import { HttpResponseError } from "../../../core/utils/http-response-error";
 
 export class PageController implements Controller {
-    
+  initialize(httpServer: HttpServer): void {
+    const apiPath = "/page";
 
-    initialize(httpServer: HttpServer): void {
-        const apiPath = '/page';
-        httpServer.post(apiPath, this.createPage.bind(this), ['authenticated']);
-        httpServer.put(apiPath, this.updatePage.bind(this), ['authenticated']);
+    // Create a new page
+    httpServer.post(apiPath, this.createPage.bind(this), ["authenticated"]);
+
+    // Update an existing page
+    httpServer.put(`${apiPath}/:id`, this.updatePage.bind(this), [
+      "authenticated",
+    ]);
+
+    // Get a page by ID
+    httpServer.get(`${apiPath}/:id`, this.getPage.bind(this), [
+      "authenticated",
+    ]);
+
+    // Delete a page by ID
+    httpServer.delete(`${apiPath}/:id`, this.deletePage.bind(this), [
+      "authenticated",
+    ]);
+
+    // Get all pages (optional)
+    httpServer.get(apiPath, this.getAllPages.bind(this), ["authenticated"]);
+  }
+
+  // Create a new page
+  private readonly createPage: RequestHandler = async (req, res, next) => {
+    try {
+      const page = await pageService.createPage(req.body, req.auth.uid);
+      if (page) {
+        res.status(201).send(page);
+      } else {
+        throw new HttpResponseError(400, "Page creation failed");
+      }
+    } catch (error) {
+      next(
+        new HttpResponseError(500, error.message || "Internal Server Error")
+      );
     }
+  };
 
-    private readonly createPage: RequestHandler = async (req, res, next,) => {
-        const page = await pageService.createPage(req.body, req.auth.uid);
-        res.send(page);
-        next();
+  // Update an existing page
+  private readonly updatePage: RequestHandler = async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      const updateData = req.body;
+
+      const success = await pageService.updatePage(id, updateData);
+      if (success) {
+        res.status(200).send({ message: "Page updated successfully" });
+      } else {
+        throw new HttpResponseError(404, "Page not found or update failed");
+      }
+    } catch (error) {
+      next(
+        new HttpResponseError(500, error.message || "Internal Server Error")
+      );
     }
+  };
 
-    private readonly updatePage: RequestHandler = async (req, res, next,) => {
-        const input: { password: string, email: string } = req.body;
-        res.send({
-            "user": input,
-        });
+  // Get a page by ID
+  private readonly getPage: RequestHandler = async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      const page = await pageService.getPage(id);
 
-        next();
+      if (page) {
+        res.status(200).send(page);
+      } else {
+        throw new HttpResponseError(404, "Page not found");
+      }
+    } catch (error) {
+      next(
+        new HttpResponseError(500, error.message || "Internal Server Error")
+      );
     }
+  };
+
+  // Delete a page by ID
+  private readonly deletePage: RequestHandler = async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      const success = await pageService.deletePage(id);
+
+      if (success) {
+        res.status(200).send({ message: "Page deleted successfully" });
+      } else {
+        throw new HttpResponseError(404, "Page not found or deletion failed");
+      }
+    } catch (error) {
+      next(
+        new HttpResponseError(500, error.message || "Internal Server Error")
+      );
+    }
+  };
+
+  // Get all pages with optional filters and pagination
+  private readonly getAllPages: RequestHandler = async (req, res, next) => {
+    try {
+      // Extract filters from query parameters
+      const filters = {
+        author: req.query.author as string,
+        type: req.query.type as string,
+        status: req.query.status as string,
+      };
+
+      // Extract pagination parameters from query parameters
+      const pageSize = parseInt(req.query.pageSize as string) || 50;
+      const pageIndex = parseInt(req.query.pageIndex as string) || 0;
+
+      const pages = await pageService.getAllPages(filters, pageSize, pageIndex);
+
+      if (pages && pages.length > 0) {
+        res.status(200).send(pages); // If pages are found, return them with 200 status
+      } else {
+        res.status(200).send([]); // If no pages are found, return an empty array with 200 status
+      }
+    } catch (error) {
+      next(
+        new HttpResponseError(500, error.message || "Internal Server Error")
+      );
+    }
+  };
 }
-

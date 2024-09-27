@@ -11,7 +11,7 @@ import {environment} from "../../../environment";
 export class AccountController implements Controller {
 
     initialize(httpServer: HttpServer): void {
-       httpServer.post ('/account', this.createAccount.bind(this));
+        httpServer.post ('/account', this.createAccount.bind(this));
         httpServer.post ('/login', this.loginAccount.bind(this));
     }
 
