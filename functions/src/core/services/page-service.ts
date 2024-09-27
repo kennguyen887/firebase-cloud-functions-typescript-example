@@ -91,10 +91,14 @@ class PageService {
     }
   }
 
-  static async getAllPages(filters: { author?: string; type?: string; status?: string }, pageSize: number = 50, pageIndex: number = 0): Promise<(Page & { id: string })[] | null> {
+  static async getAllPages(
+    filters: { author?: string; type?: string; status?: string },
+    pageSize: number = 50,
+    startAfterId?: string // Optional ID for pagination
+  ): Promise<(Page & { id: string })[] | null> {
     try {
       let query: FirebaseFirestore.Query = this.collection();
-  
+
       // Apply filters if they exist
       if (filters.author) {
         query = query.where('author', '==', filters.author);
@@ -105,28 +109,33 @@ class PageService {
       if (filters.status) {
         query = query.where('status', '==', filters.status);
       }
-  
+
       // Sort by createdAt in descending order
       query = query.orderBy('createdAt', 'desc');
-  
-      // Calculate offset (number of documents to skip) based on pageIndex and pageSize
-      const snapshot = await query
-        .offset(getOffset(pageIndex, pageSize))  // Skip documents for pagination
-        .limit(pageSize)               // Limit results to pageSize
-        .get();
-  
+
+      // If startAfterId is provided, start after the specified document
+      if (startAfterId) {
+        const lastDoc = await this.collection().doc(startAfterId).get();
+        if (lastDoc.exists) {
+          query = query.startAfter(lastDoc); // Start after the document specified by startAfterId
+        }
+      }
+
+      // Limit results to pageSize
+      const snapshot = await query.limit(pageSize).get();
+
       const pages = snapshot.docs.map(doc => {
         const pageData = doc.data() as Omit<Page, 'createdAt'> & { createdAt?: admin.firestore.Timestamp };
-  
+
         // Parse and include the document ID
         const validatedPage = pageSchema.parse({
           ...pageData,
           createdAt: pageData.createdAt?.toDate(),
         });
-  
-        return {  id: doc.id, ...validatedPage }; // Return page data along with the ID
+
+        return { ...validatedPage, id: doc.id }; // Return page data along with the ID
       });
-  
+
       return pages;
     } catch (error) {
       console.error('getAllPages errors:', error);

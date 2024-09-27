@@ -100,27 +100,26 @@ export class PageController implements Controller {
     }
   };
 
-  // Get all pages with optional filters and pagination
   private readonly getAllPages: RequestHandler = async (req, res, next) => {
     try {
-      // Extract filters from query parameters
+      // Extract filters and pagination parameters from query
       const filters = {
         author: req.query.author as string,
         type: req.query.type as string,
         status: req.query.status as string,
       };
 
-      // Extract pagination parameters from query parameters
-      const pageSize = parseInt(req.query.pageSize as string) || 50;
-      const pageIndex = parseInt(req.query.pageIndex as string) || 0;
+      const pageSize = parseInt(req.query.pageSize as string) || 50; // Default to 50
+      const startAfterId = req.query.startAfterId as string; // ID to start after
 
-      const pages = await pageService.getAllPages(filters, pageSize, pageIndex);
+      const pages = await pageService.getAllPages(
+        filters,
+        pageSize,
+        startAfterId
+      );
 
-      if (pages && pages.length > 0) {
-        res.status(200).send(pages); // If pages are found, return them with 200 status
-      } else {
-        res.status(200).send([]); // If no pages are found, return an empty array with 200 status
-      }
+      // Return the pages with 200 status, even if the result is empty
+      res.status(200).send(pages || []);
     } catch (error) {
       next(
         new HttpResponseError(500, error.message || "Internal Server Error")
