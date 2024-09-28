@@ -3,7 +3,6 @@ import * as admin from 'firebase-admin';
 import { logger } from "firebase-functions";
 import { z } from 'zod';
 import pageSchema, { Page } from '../data/page'; // Adjust import path as needed
-import { getOffset } from '../utils/pager';
 
 class PageService {
   private static collection() {
